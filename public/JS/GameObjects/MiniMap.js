@@ -30,6 +30,8 @@
 		context.globalAlpha=1;
 		context.strokeRect(this.Config.x-3,this.Config.y-3,this.Config.size+10,this.Config.size+10);
 		context.fillRect(this.Config.player_x/(3000/this.Config.size) + this.Config.x - 3,this.Config.player_y/(3000/this.Config.size) + this.Config.y-3,5,5);
+		context.fillStyle = "#F00";
+		for(key in Game.Players)context.fillRect(Game.Players[key].x/(3000/this.Config.size) + this.Config.x - 3,Game.Players[key].y/(3000/this.Config.size) + this.Config.y-3,5,5);
 		context.restore();
 	}
 	Game.MiniMap = MiniMap;
