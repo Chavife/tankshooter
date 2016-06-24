@@ -128,7 +128,7 @@
 		// draw a simple rectangle shape as our player model
 		context.save();
 		context.font = "20px Arial";
-		context.fillText("Hračov online: " + Game.Players.length-1 ,10,50);
+		context.fillText("Hračov online: " + Game.Players.length ,10,50);
 		//context.fillText("y: " + this.Config.y ,10,90);
 		context.translate(this.Config.x - xView, this.Config.y - yView);
 		context.rotate(this.Config.dir * Math.PI/180);
