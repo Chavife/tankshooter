@@ -58,7 +58,7 @@
 			for(key in Game.Players){
 				online_player.ChangePos(Game.Players[key].x,Game.Players[key].y,key);
 				online_player.ChangeDir(Game.Players[key].rot,key);
-				online_player.draw(context, camera.xView, camera.yView);
+				online_player.draw(context, camera.xView, camera.yView,"enemy");
 			}
 			MiniMap.draw(context);
 			

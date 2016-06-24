@@ -18,7 +18,7 @@ io.on ('connection', function (socket) {
 	console.log ('   Total server clients='+ socket.conn.server.clientsCount);
 	Players[socket.id.substring(2)] = {x:500,y:500,rot:0};
 	socket.broadcast.emit('player',500,500,0,socket.id.substring(2));
-	for(key in Players) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,key);
+	for(key in Players) if(key != socket.id.substring(2)) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,key);
 	
 	
 	socket.on ('disconnect', function () {
@@ -29,7 +29,6 @@ io.on ('connection', function (socket) {
 	});
 
 	socket.on ('changed_pos', function (id, x, y) {
-		console.log(Players);
 		Players[id].x = x;
 		Players[id].y = y;
 		socket.broadcast.emit('player_changed_pos',id,x,y);

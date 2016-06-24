@@ -20,6 +20,8 @@
 		this.reloadTimerID = null;
 		this.img = document.createElement('img');
 		this.img.setAttribute('src','Pictures/tank.png');
+		this.enemyimg = document.createElement('img');
+		this.enemyimg.setAttribute('src','Pictures/enemytank.png');
 		//this.ChangePos(Math.random () * (200) + 50, Math.random () * (200) + 50);	
 		//this.ChangeDir(Math.random () * (360));
 	}
@@ -124,27 +126,39 @@
 			
 	}
 	
-	Tank.prototype.draw = function(context, xView, yView) {
+	Tank.prototype.draw = function(context, xView, yView, enemy) {
 		// draw a simple rectangle shape as our player model
 		context.save();
-		context.font = "20px Arial";
-		context.fillText("Hračov online: " + Game.Players.length ,10,50);
-		//context.fillText("y: " + this.Config.y ,10,90);
+		
+		//health
+		context.fillStyle = "#F00";
+		context.fillRect((this.Config.x - this.Config.size / 2) - xView,
+						 (this.Config.y + this.Config.size / 2 + 15) - yView,
+						  this.Config.size+5,5);
+		context.strokeStyle = "#222";
+		
+		
 		context.translate(this.Config.x - xView, this.Config.y - yView);
+		
 		context.rotate(this.Config.dir * Math.PI/180);
 		context.translate(-(this.Config.x - xView), 
 						  -(this.Config.y - yView));
 		context.drawImage(this.img, (this.Config.x - this.Config.size / 2) - xView, 
 									(this.Config.y - this.Config.size / 2) - yView,
 									 this.Config.size, this.Config.size);
+		
+		
+		
+		
+		
 		context.beginPath();
 		context.arc((this.Config.x) - xView,(this.Config.y) - yView,(this.Config.size+25)/2,0,2*Math.PI);
-		context.strokeStyle = "#080";
-		context.globalAlpha=0.2;
+		if(enemy == null)context.strokeStyle = "#080";
+		else context.strokeStyle = "#F00";
+		context.globalAlpha=0.5;
 		context.lineWidth = 3;
 		context.stroke();
-		context.closePath();
-		
+		context.closePath();		
 		context.restore();
 	}
 	
