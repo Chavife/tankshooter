@@ -56,7 +56,6 @@
 			for(key in Game.Missiles) Game.Missiles[key].draw(context, camera.xView, camera.yView);
 			player.draw(context, camera.xView, camera.yView);
 			for(key in Game.Players){
-				console.log(Game.Players[key]);
 				online_player.ChangePos(Game.Players[key].x,Game.Players[key].y,key);
 				online_player.ChangeDir(Game.Players[key].rot,key);
 				online_player.draw(context, camera.xView, camera.yView);
