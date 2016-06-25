@@ -15,7 +15,7 @@
 			reload_time : 250, //time that need to reload missile
 			turn_radius : 5, //turn radius in angle
 			speed : 500, //speed (smaller is higher)
-			HP : 10,
+			HP : 20,
 		};
 		this.currentHP = this.Config.HP;
 		this.reloaded = true;
@@ -29,7 +29,11 @@
 	Tank.prototype.ChangePos = function(x,y,id){
 		this.Config.x = x;
 		this.Config.y = y;
-		if(id == null) socket.emit ('changed_pos', socket.id, this.Config.x, this.Config.y);
+		if(id == null){
+			Game.Me.x = x;
+			Game.Me.y = y;
+			socket.emit ('changed_pos', socket.id, this.Config.x, this.Config.y);
+		}
 	}
 	
 	Tank.prototype.ChangeDir = function(d,id){
@@ -37,7 +41,10 @@
 		    if (d < 0.0) this.Config.dir = 360.0 - (-d % 360.0);
 		    else this.Config.dir = d % 360.0;
 		}else this.Config.dir = d;
-		if(id == null) socket.emit ('changed_rot', socket.id, this.Config.dir);
+		if(id == null){
+			Game.Me.rot = this.Config.dir;
+			socket.emit ('changed_rot', socket.id, this.Config.dir);
+		}
 	}
 	
 	Tank.prototype.move = function (d,dir) {
@@ -127,8 +134,8 @@
 			
 	}
 	
-	Tank.prototype.take_damage = function() {
-		if(this.currentHP>0)this.currentHP--;
+	Tank.prototype.update_HP = function(hp) {
+		this.currentHP = hp;
 	}
 	
 	Tank.prototype.draw = function(context, xView, yView, enemy) {
@@ -170,6 +177,7 @@
 	Tank.prototype.shoot = function() {
 		var x = this.Config.x - this.Config.size/2, y = this.Config.y - this.Config.size/2;  
 		new Game.Missile(x,y,this.Config.dir,this.Config.missile_step);
+		socket.emit ('missile_shot', x,y,this.Config.dir,this.Config.missile_step, socket.id);
 		this.shoot_cooldown();
 	}
 	Tank.prototype.shoot_cooldown = function() {

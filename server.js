@@ -10,22 +10,24 @@ var io = require ('socket.io').listen(app.listen (process.env.PORT || port,funct
 
 var Players = [];
 
+
 io.on ('connection', function (socket) {
 	var re_addr = socket.request.connection.remoteAddress+':'+socket.request.connection.remotePort;
 	var hndsh = socket.handshake, date = new Date ();
 	console.log ('-- Client '+re_addr+' connected ['+socket.nsp.name+'] on '+ date + ' --');
 	console.log ('   sockID='+socket.id+ '  cookies=', hndsh.headers.cookie);
 	console.log ('   Total server clients='+ socket.conn.server.clientsCount);
-	Players[socket.id.substring(2)] = {x:500,y:500,rot:0};
-	socket.broadcast.emit('player',500,500,0,socket.id.substring(2));
-	for(key in Players) if(key != socket.id.substring(2)) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,key);
 	
+	Players[socket.id.substring(2)] = {x:500,y:500,rot:0,HP:20};
+	socket.broadcast.emit('player',500,500,0,20,socket.id.substring(2));
+	
+	for(key in Players) if(key != socket.id.substring(2)) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,Players[key].HP,key);
 	
 	socket.on ('disconnect', function () {
 		console.log ('-- Client '+re_addr+' disconnected ['+socket.nsp.name+'] --');
 		console.log ('   Total server clients='+ socket.conn.server.clientsCount);
 		if(Players[socket.id.substring(2)] != null) delete Players[socket.id.substring(2)];
-		socket.broadcast.emit('leave_player',socket.id.substring(2));
+		socket.broadcast.emit('player_leave',socket.id.substring(2));
 	});
 
 	socket.on ('changed_pos', function (id, x, y) {
@@ -38,6 +40,14 @@ io.on ('connection', function (socket) {
 		Players[id].rot = rot;
 		socket.broadcast.emit('player_changed_rot',id,rot);
 	});
-
+	
+	socket.on ('missile_shot', function (x, y, dir, step, id) {
+		socket.broadcast.emit('generate_missile',x, y, dir, step, id);
+	});
+	
+	socket.on ('take_dmg', function (HP) {
+		Players[socket.id.substring(2)].HP = HP;
+		socket.broadcast.emit('update_HP',socket.id.substring(2),HP);
+	});
 
 });

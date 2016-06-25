@@ -1,9 +1,9 @@
 (function() {
-	function Missile(spawn_x,spawn_y, spawn_dir, spawn_speed){
+	function Missile(spawn_x,spawn_y, spawn_dir, spawn_speed, enemyID){
 		var self = this;
 		
 		this.Config = {
-			size : 10, //tank size in px
+			size : 10, //missile size in px
 			speed : spawn_speed,
 			x : spawn_x + 30, //x pos
 			y : spawn_y + 30, //y pos
@@ -12,6 +12,7 @@
 		this.Config.x += this.Config.size / 2; //Correction
 		this.Config.y += this.Config.size / 2; //
 		this.TTL = 500;
+		this.enemyID = enemyID;
 		
 		this.ID = IDC.giveID('M');
 		Game.Missiles[this.ID] = this;
@@ -26,33 +27,33 @@
 	Missile.prototype.ChangePos = function(x,y){
 		this.Config.x = x;
 		this.Config.y = y;
+		var tank_r = (70 + 25)/2;
+		for(key in Game.Players){
+			if(key == this.enemyID) continue;
+			var a = x - Game.Players[key].x;
+			var b = y - Game.Players[key].y;
+			var distance = Math.sqrt((a*a)+(b*b));
+			if (distance < this.Config.size/2 + tank_r){
+				this.TTL = 0;
+				break;
+			}
+		}
+		var a = x - Game.Me.x;
+		var b = y - Game.Me.y;
+		var distance = Math.sqrt((a*a)+(b*b));
+		if (distance < this.Config.size/2 + tank_r){
+			if(this.enemyID != null){
+				this.TTL = 0;
+				if(Game.Me.HP>0){
+					Game.Me.HP--;
+					socket.emit ('take_dmg', Game.Me.HP);
+				}
+			}
+		}
 	}
-	
-	Missile.prototype.collision =  function (rect){
-		var distX = Math.abs(this.Config.x - rect.x-rect.w/2);
-	    var distY = Math.abs(this.Config.y - rect.y-rect.h/2);
-
-	    if (distX > (rect.w/2 + this.Config.size)) { return false; }
-	    if (distY > (rect.h/2 + this.Config.size)) { return false; }
-
-	    if (distX <= (rect.w/2)) { return true; } 
-	    if (distY <= (rect.h/2)) { return true; }
-
-	    var dx=distX-rect.w/2;
-	    var dy=distY-rect.h/2;
-	    return (dx*dx+dy*dy<=(this.Config.size*this.Config.size));
-	}
-	
 
 	Missile.prototype.move = function (d) {// {{{
 		var x = this.Config.x, y = this.Config.y;  
-//		var col = false;
-//		for(var i = 0; i < Game.obstacles.length; i++){
-//			if(this.collision(Game.obstacles[i])){
-//				col = true;
-//			}
-//		}
-//		if(col)this.TTL = 0;
 		this.TTL -= d;
 		for (; d > 0; d--) {
 			var rad = (2 * Math.PI) / 360 * (this.Config.dir);
@@ -73,6 +74,8 @@
 	}
 	
 	Missile.prototype.draw = function(context, xView, yView) {
+		console.log("d");
+		console.log(this.TTL + " " + this.Config.x + " " + this.Config.y );
 		context.save();
 		context.drawImage(this.img, (this.Config.x - this.Config.size / 2) - xView, 
 									(this.Config.y - this.Config.size / 2) - yView,
@@ -81,3 +84,8 @@
 	}
 	Game.Missile = Missile;
 })();
+
+socket.on('generate_missile',function(x, y, dir, step, id) {
+	//console.log(x + " " + y +" " + " " + dir + " " + step);
+	new Game.Missile(x, y, dir, step, id);
+});

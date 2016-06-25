@@ -23,6 +23,7 @@
 	var MiniMap = new Game.MiniMap(); //Minimap
 
 	var player = new Game.Tank(500, 500); //Player
+	
 	var online_player = new Game.Tank(600, 600); //Player
 
 	/*<------CAMERA------>*/
@@ -44,6 +45,7 @@
 		player.update(STEP, room.width, room.height);
 		MiniMap.updatePlayerPosition(player.Config.x,player.Config.y);
 		camera.update();
+		player.currentHP = Game.Me.HP;
 	}
 	/*----------------------------------*/
 	
@@ -58,6 +60,7 @@
 			for(key in Game.Players){
 				online_player.ChangePos(Game.Players[key].x,Game.Players[key].y,key);
 				online_player.ChangeDir(Game.Players[key].rot,key);
+				online_player.update_HP(Game.Players[key].HP);
 				online_player.draw(context, camera.xView, camera.yView,"enemy");
 			}
 			MiniMap.draw(context);
@@ -102,3 +105,5 @@
 window.onload = function() {
 	Game.play();
 }
+
+

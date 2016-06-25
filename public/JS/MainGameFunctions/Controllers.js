@@ -3,23 +3,34 @@ socket = io.connect ();
 window.Game = [];
 Game.Missiles = [];
 Game.Players = [];
+Game.Me = {x:500,y:500,rot:0,HP:20};
 
-socket.on('player',function player(x,y,rot,key) {
-	Game.Players[key] = {x:x,y:y,rot:rot};
+socket.on('player',function(x,y,rot,hp,key) {
+	Game.Players[key] = {x:x,y:y,rot:rot,HP:hp};
 });
 
-socket.on('player_changed_pos',function players(id,x,y) {
+socket.on('player_changed_pos',function(id,x,y) {
 	Game.Players[id].x = x;
 	Game.Players[id].y = y;
 });
 
-socket.on('player_changed_rot',function players(id,rot) {
+socket.on('player_changed_rot',function(id,rot) {
 	Game.Players[id].rot = rot;
 });
 
-socket.on('leave_player',function players(id) {
+socket.on('player_leave',function(id) {
 	delete Game.Players[id];
 });
+
+socket.on('update_HP',function(id,hp) {
+	Game.Players[id].HP = hp;
+});
+
+
+
+
+
+
 
 /*Gives a uniqe ID for Object*/
 function IDController(){
@@ -60,9 +71,6 @@ Game.controls = {
 		case 32:
 			Game.controls.shoot = true;
 			break;
-		case 68:
-			Game.controls.self_destroy = true;
-			break;
 		}
 	}, false);
 
@@ -82,9 +90,6 @@ Game.controls = {
 			break;
 		case 32:
 			Game.controls.shoot = false;
-			break;
-		case 68:
-			Game.controls.self_destroy = false;
 			break;
 		
 		case 80: // key P pauses the game
