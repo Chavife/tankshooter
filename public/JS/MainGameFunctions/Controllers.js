@@ -40,6 +40,7 @@ Game.controls = {
 		right : false,
 		down : false,
 		shoot : false,
+		self_destroy : false,
 	};
 
 	window.addEventListener("keydown", function(e) {
@@ -58,6 +59,9 @@ Game.controls = {
 			break;
 		case 32:
 			Game.controls.shoot = true;
+			break;
+		case 68:
+			Game.controls.self_destroy = true;
 			break;
 		}
 	}, false);
@@ -78,6 +82,9 @@ Game.controls = {
 			break;
 		case 32:
 			Game.controls.shoot = false;
+			break;
+		case 68:
+			Game.controls.self_destroy = false;
 			break;
 		
 		case 80: // key P pauses the game

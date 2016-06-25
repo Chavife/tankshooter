@@ -15,13 +15,13 @@
 			reload_time : 250, //time that need to reload missile
 			turn_radius : 5, //turn radius in angle
 			speed : 500, //speed (smaller is higher)
+			HP : 10,
 		};
+		this.currentHP = this.Config.HP;
 		this.reloaded = true;
 		this.reloadTimerID = null;
 		this.img = document.createElement('img');
 		this.img.setAttribute('src','Pictures/tank.png');
-		this.enemyimg = document.createElement('img');
-		this.enemyimg.setAttribute('src','Pictures/enemytank.png');
 		//this.ChangePos(Math.random () * (200) + 50, Math.random () * (200) + 50);	
 		//this.ChangeDir(Math.random () * (360));
 	}
@@ -117,6 +117,7 @@
 		if (Game.controls.right) this.ChangeDir(this.Config.dir + this.Config.turn_radius);
 		if (Game.controls.down) this.move(this.Config.move_step, "backward");
 		if (Game.controls.shoot && this.reloaded) this.shoot();
+		if (Game.controls.self_destroy) this.take_damage();
 
 		// don't let player leaves the world's boundary
 		if (this.Config.x - this.Config.hitbox_r < 0) this.Config.x = this.Config.hitbox_r;
@@ -126,16 +127,23 @@
 			
 	}
 	
+	Tank.prototype.take_damage = function() {
+		if(this.currentHP>0)this.currentHP--;
+	}
+	
 	Tank.prototype.draw = function(context, xView, yView, enemy) {
 		// draw a simple rectangle shape as our player model
 		context.save();
 		
 		//health
+		context.fillStyle = "#222";
+		context.fillRect((this.Config.x - this.Config.size / 2) - xView-1,
+						 (this.Config.y + this.Config.size / 2 + 15) - yView-1,
+						  this.Config.size+2,7);
 		context.fillStyle = "#F00";
 		context.fillRect((this.Config.x - this.Config.size / 2) - xView,
 						 (this.Config.y + this.Config.size / 2 + 15) - yView,
-						  this.Config.size+5,5);
-		context.strokeStyle = "#222";
+						  (this.Config.size/this.Config.HP)*this.currentHP,5);
 		
 		
 		context.translate(this.Config.x - xView, this.Config.y - yView);
@@ -146,10 +154,6 @@
 		context.drawImage(this.img, (this.Config.x - this.Config.size / 2) - xView, 
 									(this.Config.y - this.Config.size / 2) - yView,
 									 this.Config.size, this.Config.size);
-		
-		
-		
-		
 		
 		context.beginPath();
 		context.arc((this.Config.x) - xView,(this.Config.y) - yView,(this.Config.size+25)/2,0,2*Math.PI);

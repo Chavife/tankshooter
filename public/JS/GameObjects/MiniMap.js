@@ -21,6 +21,12 @@
 	}
 	MiniMap.prototype.draw = function(context) {
 		context.save();
+		
+		context.font = "20px Arial";
+		context.fillText("Move: arrows",10,50);
+		context.fillText("Shoot: spacebar",10,70);
+		context.fillText("Self destroy (dev): D",10,90);
+		
 		context.globalAlpha=0.5;
 		context.fillStyle = "#000";
 		context.fillRect(this.Config.x,this.Config.y,this.Config.size,this.Config.size);
