@@ -1,5 +1,5 @@
 (function() {
-	function Tank(x_,y_){
+	function Tank(x_,y_,rot_){
 		var self = this;
 		
 		this.Config = {
@@ -7,7 +7,7 @@
 			hitbox_r : (70 + 25)/2,
 			x : x_ || 0, //x pos
 			y : x_ || 0, //y pos
-			dir : 0, //rotation dir%360
+			dir : rot_ || 0, //rotation dir%360
 			move_step : 10, //movement step in px
 			missile_step : 15, //missile step in px
 			missile_speed : 15, //missile speed (smaller is higher)
@@ -71,7 +71,6 @@
 	    if (distY > (rect.h/2 + this.Config.hitbox_r)) { return false; }
 
 	    if (distX <= (rect.w/2)) {
-	    	console.log("distx is: " + (rect.w/2 - distX));
 	    	if(this.Config.x < rect.x)this.Config.x -= Math.abs(rect.w/2 - distX);
 	    	else this.Config.x += Math.abs(rect.w/2 - distX + this.Config.hitbox_r);
 	    	
@@ -190,3 +189,4 @@
 	}
 	Game.Tank = Tank;
 })();
+

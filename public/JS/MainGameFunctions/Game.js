@@ -21,10 +21,15 @@
 	room.map.generate(); // generate a large image texture for the room
 	
 	var MiniMap = new Game.MiniMap(); //Minimap
-
-	var player = new Game.Tank(500, 500); //Player
+	var player = new Game.Tank(500,500); //Player
+	socket.on('give_my_pos', function(x,y,rot,hp) {
+		Game.Me = {x:x,y:y,rot:rot,HP:hp};
+		player.ChangePos(x,y);
+		player.ChangeDir(rot);
+		player.update_HP(hp);
+	});
 	
-	var online_player = new Game.Tank(600, 600); //Player
+	var online_player = new Game.Tank(); //Player
 
 	/*<------CAMERA------>*/
 	var camera = new Game.Camera(0, 0, canvas.width, canvas.height, room.width, room.height);

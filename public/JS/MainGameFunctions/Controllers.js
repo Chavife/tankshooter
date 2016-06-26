@@ -3,7 +3,11 @@ socket = io.connect ();
 window.Game = [];
 Game.Missiles = [];
 Game.Players = [];
-Game.Me = {x:500,y:500,rot:0,HP:20};
+
+Game.Me = {x:0,y:0,rot:0,HP:20};
+
+
+
 
 socket.on('player',function(x,y,rot,hp,key) {
 	Game.Players[key] = {x:x,y:y,rot:rot,HP:hp};

@@ -11,17 +11,46 @@ var io = require ('socket.io').listen(app.listen (process.env.PORT || port,funct
 var Players = [];
 
 
+
+
 io.on ('connection', function (socket) {
+	
+	function give_position() {
+		var collision = true;
+		var tank_r = (70 + 25)/2;
+		while(collision){
+			collision = false;
+			var x = Math.random () * (3000-tank_r) + tank_r;
+			var y = Math.random () * (3000-tank_r) + tank_r;
+			var rot = Math.floor(Math.random () * (360));
+			for(key in Players){
+				if(key != socket.id.substring(2)) continue;
+				var a = x - Players[key].x;
+				var b = y - Players[key].y;
+				var distance = Math.sqrt((a*a)+(b*b));
+				if (distance < tank_r*2){
+					collision = true;
+					break;
+				}
+			}
+		}
+		return {x:x,y:y,rot:rot,HP:20};
+	}
+	
+	
+	
 	var re_addr = socket.request.connection.remoteAddress+':'+socket.request.connection.remotePort;
 	var hndsh = socket.handshake, date = new Date ();
 	console.log ('-- Client '+re_addr+' connected ['+socket.nsp.name+'] on '+ date + ' --');
 	console.log ('   sockID='+socket.id+ '  cookies=', hndsh.headers.cookie);
 	console.log ('   Total server clients='+ socket.conn.server.clientsCount);
-	
-	Players[socket.id.substring(2)] = {x:500,y:500,rot:0,HP:20};
-	socket.broadcast.emit('player',500,500,0,20,socket.id.substring(2));
-	
+
+	var position = give_position();
+	Players[socket.id.substring(2)] = position; 
+	socket.broadcast.emit('player',position.x,position.y,position.dir,position.HP,socket.id.substring(2));
 	for(key in Players) if(key != socket.id.substring(2)) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,Players[key].HP,key);
+	socket.emit('give_my_pos',position.x,position.y,position.rot,position.HP);
+	
 	
 	socket.on ('disconnect', function () {
 		console.log ('-- Client '+re_addr+' disconnected ['+socket.nsp.name+'] --');
@@ -48,6 +77,13 @@ io.on ('connection', function (socket) {
 	socket.on ('take_dmg', function (HP) {
 		Players[socket.id.substring(2)].HP = HP;
 		socket.broadcast.emit('update_HP',socket.id.substring(2),HP);
+	});
+	
+	socket.on ('dead', function () {
+		var position = give_position();
+		Players[socket.id.substring(2)] = position; 
+		socket.broadcast.emit('player',position.x,position.y,position.dir,position.HP,socket.id.substring(2));
+		socket.emit('give_my_pos',position.x,position.y,position.rot,position.HP);
 	});
 
 });

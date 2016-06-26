@@ -47,6 +47,7 @@
 				if(Game.Me.HP>0){
 					Game.Me.HP--;
 					socket.emit ('take_dmg', Game.Me.HP);
+					if(Game.Me.HP == 0)socket.emit ('dead');
 				}
 			}
 		}
@@ -74,8 +75,6 @@
 	}
 	
 	Missile.prototype.draw = function(context, xView, yView) {
-		console.log("d");
-		console.log(this.TTL + " " + this.Config.x + " " + this.Config.y );
 		context.save();
 		context.drawImage(this.img, (this.Config.x - this.Config.size / 2) - xView, 
 									(this.Config.y - this.Config.size / 2) - yView,
