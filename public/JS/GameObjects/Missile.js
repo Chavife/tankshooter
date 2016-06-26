@@ -35,7 +35,12 @@
 			var distance = Math.sqrt((a*a)+(b*b));
 			if (distance < this.Config.size/2 + tank_r){
 				this.TTL = 0;
-				break;
+				if(Game.Players[key].HP > 0){
+					Game.Players[key].HP--;
+					socket.emit ('make_dmg', Game.Players[key].HP,key);
+					break;
+				}
+				
 			}
 		}
 		var a = x - Game.Me.x;
@@ -46,8 +51,6 @@
 				this.TTL = 0;
 				if(Game.Me.HP>0){
 					Game.Me.HP--;
-					socket.emit ('take_dmg', Game.Me.HP);
-					if(Game.Me.HP == 0)socket.emit ('dead');
 				}
 			}
 		}

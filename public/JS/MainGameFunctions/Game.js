@@ -29,6 +29,18 @@
 		player.update_HP(hp);
 	});
 	
+	socket.on('player',function(x,y,rot,hp,key) {
+		if(key == socket.id){
+			Game.Me = {x:x,y:y,rot:rot,HP:hp};
+			player.ChangePos(x,y);
+			player.ChangeDir(rot);
+			player.update_HP(hp);
+		}else{
+			Game.Players[key] = {x:x,y:y,rot:rot,HP:hp};
+		}
+		
+	});
+	
 	var online_player = new Game.Tank(); //Player
 
 	/*<------CAMERA------>*/

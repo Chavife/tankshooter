@@ -9,9 +9,7 @@ Game.Me = {x:0,y:0,rot:0,HP:20};
 
 
 
-socket.on('player',function(x,y,rot,hp,key) {
-	Game.Players[key] = {x:x,y:y,rot:rot,HP:hp};
-});
+
 
 socket.on('player_changed_pos',function(id,x,y) {
 	Game.Players[id].x = x;
@@ -24,10 +22,6 @@ socket.on('player_changed_rot',function(id,rot) {
 
 socket.on('player_leave',function(id) {
 	delete Game.Players[id];
-});
-
-socket.on('update_HP',function(id,hp) {
-	Game.Players[id].HP = hp;
 });
 
 

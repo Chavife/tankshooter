@@ -74,16 +74,16 @@ io.on ('connection', function (socket) {
 		socket.broadcast.emit('generate_missile',x, y, dir, step, id);
 	});
 	
-	socket.on ('take_dmg', function (HP) {
-		Players[socket.id.substring(2)].HP = HP;
-		socket.broadcast.emit('update_HP',socket.id.substring(2),HP);
+	socket.on ('make_dmg', function (HP,id) {
+		Players[id].HP = HP;
+		//socket.broadcast.emit('update_HP',id,HP);
+		if(HP == 0){
+			var position = give_position();
+			Players[id] = position; 
+			socket.emit('player',position.x,position.y,position.rot,position.HP,id);
+			socket.broadcast.emit('player',position.x,position.y,position.rot,position.HP,id);
+		}
 	});
-	
-	socket.on ('dead', function () {
-		var position = give_position();
-		Players[socket.id.substring(2)] = position; 
-		socket.broadcast.emit('player',position.x,position.y,position.dir,position.HP,socket.id.substring(2));
-		socket.emit('give_my_pos',position.x,position.y,position.rot,position.HP);
-	});
+
 
 });
