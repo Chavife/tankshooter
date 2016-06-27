@@ -4,12 +4,7 @@ window.Game = [];
 Game.Missiles = [];
 Game.Players = [];
 
-Game.Me = {x:0,y:0,rot:0,HP:20};
-
-
-
-
-
+Game.Me = {x:0,y:0,rot:0,HP:20,kills:0,deaths:0};
 
 socket.on('player_changed_pos',function(id,x,y) {
 	Game.Players[id].x = x;
@@ -24,11 +19,10 @@ socket.on('player_leave',function(id) {
 	delete Game.Players[id];
 });
 
-
-
-
-
-
+socket.on('update_killer',function(id) {
+	if(id == socket.id)Game.Me.kills++;
+	else Game.Players[id].kills++;
+});
 
 /*Gives a uniqe ID for Object*/
 function IDController(){
@@ -49,7 +43,6 @@ Game.controls = {
 		right : false,
 		down : false,
 		shoot : false,
-		self_destroy : false,
 	};
 
 	window.addEventListener("keydown", function(e) {

@@ -15,7 +15,7 @@ var Players = [];
 
 io.on ('connection', function (socket) {
 	
-	function give_position() {
+	function give_position(id) {
 		var collision = true;
 		var tank_r = (70 + 25)/2;
 		while(collision){
@@ -24,7 +24,6 @@ io.on ('connection', function (socket) {
 			var y = Math.random () * (3000-tank_r) + tank_r;
 			var rot = Math.floor(Math.random () * (360));
 			for(key in Players){
-				if(key != socket.id.substring(2)) continue;
 				var a = x - Players[key].x;
 				var b = y - Players[key].y;
 				var distance = Math.sqrt((a*a)+(b*b));
@@ -34,9 +33,15 @@ io.on ('connection', function (socket) {
 				}
 			}
 		}
-		return {x:x,y:y,rot:rot,HP:20};
+		if(Players[id] != undefined){
+			var kills = Players[id].kills;
+			var deaths = Players[id].deaths;
+		}else{
+			var kills = 0;
+			var deaths = 0;
+		}
+		return {x:x,y:y,rot:rot,HP:20,kills:kills,deaths:deaths};
 	}
-	
 	
 	
 	var re_addr = socket.request.connection.remoteAddress+':'+socket.request.connection.remotePort;
@@ -45,11 +50,10 @@ io.on ('connection', function (socket) {
 	console.log ('   sockID='+socket.id+ '  cookies=', hndsh.headers.cookie);
 	console.log ('   Total server clients='+ socket.conn.server.clientsCount);
 
-	var position = give_position();
+	var position = give_position(socket.id.substring(2));
 	Players[socket.id.substring(2)] = position; 
-	socket.broadcast.emit('player',position.x,position.y,position.dir,position.HP,socket.id.substring(2));
-	for(key in Players) if(key != socket.id.substring(2)) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,Players[key].HP,key);
-	socket.emit('give_my_pos',position.x,position.y,position.rot,position.HP);
+	socket.broadcast.emit('player',position.x,position.y,position.dir,position.HP,position.kills,position.deaths,socket.id.substring(2));
+	for(key in Players) socket.emit('player',Players[key].x,Players[key].y,Players[key].rot,Players[key].HP,Players[key].kills,Players[key].deaths,key);
 	
 	
 	socket.on ('disconnect', function () {
@@ -76,14 +80,16 @@ io.on ('connection', function (socket) {
 	
 	socket.on ('make_dmg', function (HP,id) {
 		Players[id].HP = HP;
-		//socket.broadcast.emit('update_HP',id,HP);
 		if(HP == 0){
-			var position = give_position();
+			Players[id].deaths++;
+			Players[socket.id.substring(2)].kills++;
+			var position = give_position(id);
 			Players[id] = position; 
-			socket.emit('player',position.x,position.y,position.rot,position.HP,id);
-			socket.broadcast.emit('player',position.x,position.y,position.rot,position.HP,id);
+			socket.emit('player',position.x,position.y,position.rot,position.HP,position.kills,position.deaths,id);
+			socket.broadcast.emit('player',position.x,position.y,position.rot,position.HP,position.kills,position.deaths,id);
+			socket.emit('update_killer',socket.id.substring(2));
+			socket.broadcast.emit('update_killer',socket.id.substring(2));
 		}
 	});
-
 
 });

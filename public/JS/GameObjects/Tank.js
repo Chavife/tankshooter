@@ -62,59 +62,6 @@
 		this.ChangePos (x, y);
 	}
 	
-	Tank.prototype.collision =  function (rect){
-		
-		var distX = Math.abs(this.Config.x - rect.x-rect.w/2);
-	    var distY = Math.abs(this.Config.y - rect.y-rect.w/2);
-
-	    if (distX > (rect.w/2 + this.Config.hitbox_r)) { return false; }
-	    if (distY > (rect.h/2 + this.Config.hitbox_r)) { return false; }
-
-	    if (distX <= (rect.w/2)) {
-	    	if(this.Config.x < rect.x)this.Config.x -= Math.abs(rect.w/2 - distX);
-	    	else this.Config.x += Math.abs(rect.w/2 - distX + this.Config.hitbox_r);
-	    	
-	    	return true;
-	    } 
-//	    if (distY <= (rect.h/2)) { 
-//	    	console.log("disty is: " + distY);
-//	    	if(this.Config.x < rect.x)this.Config.x += distY + rect.h/2;
-//	    	else this.Config.x -= distX + rect.h/2;
-//	    	
-//	    	return true;
-//	    }
-	    
-	    
-	    var dx=distX-rect.w/2; 
-	    var dy=distY-rect.h/2;
-	    if (dx*dx+dy*dy<=(this.Config.hitbox_r*this.Config.hitbox_r)){
-	    };
-	    
-		/*
-		var distX = Math.abs(this.Config.x - rect.x-rect.w/2);
-	    var distY = Math.abs(this.Config.y - rect.y-rect.h/2);
-
-	    if (distX > (rect.w/2 + this.Config.hitbox_r)) { return -1; }
-	    if (distY > (rect.h/2 + this.Config.hitbox_r)) { return -1; }
-
-	    if (distX <= (rect.w/2)) { 
-	    	if(this.Config.y < rect.y)return 0;
-	    	else return 1;
-	    } 
-	    if (distY <= (rect.h/2)) {
-	    	if(this.Config.y < rect.y)return 2;
-	    	else return 3; 
-	    }
-
-	    var dx=distX-rect.w/2;
-	    var dy=distY-rect.h/2;
-	    if(dx*dx+dy*dy<=(this.Config.hitbox_r*this.Config.hitbox_r)){
-	    	return 4;
-	    };
-	    */
-	}
-	
-	
 	
 	Tank.prototype.update = function(step, worldWidth, worldHeight) {
 		// check controls and move the player accordingly
@@ -123,7 +70,6 @@
 		if (Game.controls.right) this.ChangeDir(this.Config.dir + this.Config.turn_radius);
 		if (Game.controls.down) this.move(this.Config.move_step, "backward");
 		if (Game.controls.shoot && this.reloaded) this.shoot();
-		if (Game.controls.self_destroy) this.take_damage();
 
 		// don't let player leaves the world's boundary
 		if (this.Config.x - this.Config.hitbox_r < 0) this.Config.x = this.Config.hitbox_r;
@@ -133,11 +79,9 @@
 			
 	}
 	
-	Tank.prototype.update_HP = function(hp) {
-		this.currentHP = hp;
-	}
+	Tank.prototype.update_HP = function(hp){this.currentHP = hp;} 
 	
-	Tank.prototype.draw = function(context, xView, yView, enemy) {
+	Tank.prototype.draw = function(context, xView, yView, kills, deaths, enemy) {
 		// draw a simple rectangle shape as our player model
 		context.save();
 		
@@ -150,7 +94,11 @@
 		context.fillRect((this.Config.x - this.Config.size / 2) - xView,
 						 (this.Config.y + this.Config.size / 2 + 15) - yView,
 						  (this.Config.size/this.Config.HP)*this.currentHP,5);
-		
+		//score
+		context.fillStyle = "#000";
+		context.font = "15px Arial";
+		context.fillText(kills + "/" + deaths,(this.Config.x - this.Config.size / 2) - xView,
+										(this.Config.y - this.Config.size / 2 - 15) - yView);
 		
 		context.translate(this.Config.x - xView, this.Config.y - yView);
 		

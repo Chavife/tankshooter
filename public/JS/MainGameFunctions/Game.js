@@ -22,21 +22,15 @@
 	
 	var MiniMap = new Game.MiniMap(); //Minimap
 	var player = new Game.Tank(500,500); //Player
-	socket.on('give_my_pos', function(x,y,rot,hp) {
-		Game.Me = {x:x,y:y,rot:rot,HP:hp};
-		player.ChangePos(x,y);
-		player.ChangeDir(rot);
-		player.update_HP(hp);
-	});
 	
-	socket.on('player',function(x,y,rot,hp,key) {
+	socket.on('player',function(x,y,rot,hp,kills,deaths,key) {
 		if(key == socket.id){
-			Game.Me = {x:x,y:y,rot:rot,HP:hp};
+			Game.Me = {x:x,y:y,rot:rot,HP:hp,kills:kills,deaths:deaths};
 			player.ChangePos(x,y);
 			player.ChangeDir(rot);
 			player.update_HP(hp);
 		}else{
-			Game.Players[key] = {x:x,y:y,rot:rot,HP:hp};
+			Game.Players[key] = {x:x,y:y,rot:rot,HP:hp,kills:kills,deaths:deaths};
 		}
 		
 	});
@@ -73,12 +67,12 @@
 		/* START redraw all objects*/
 			room.map.draw(context, camera.xView, camera.yView);
 			for(key in Game.Missiles) Game.Missiles[key].draw(context, camera.xView, camera.yView);
-			player.draw(context, camera.xView, camera.yView);
+			player.draw(context, camera.xView, camera.yView, Game.Me.kills, Game.Me.deaths);
 			for(key in Game.Players){
 				online_player.ChangePos(Game.Players[key].x,Game.Players[key].y,key);
 				online_player.ChangeDir(Game.Players[key].rot,key);
 				online_player.update_HP(Game.Players[key].HP);
-				online_player.draw(context, camera.xView, camera.yView,"enemy");
+				online_player.draw(context, camera.xView, camera.yView,Game.Players[key].kills,Game.Players[key].deaths,"enemy");
 			}
 			MiniMap.draw(context);
 			
